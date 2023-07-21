@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METAS ESCOLA</title>
+
+    <link rel="stylesheet" href="/assets/css/metas.css">
+</head>
+
+<body>
+    <ul>
+        <li><a href="/">ESCOLA</a></li>
+        <li><a href="/home/consultor.html">CONSULTOR</a></li>
+        <li><a href="/home/street.html">STREET</a></li>
+        <li><a href="/home/telemarketing.html">TELEMARKETING</a></li>
+    </ul>
+
+
+    <h1 style="text-align: center; font-size: 50px;">CONSULTORIA DE CARREIRA INTERNA ESPERADO</h1>
+
+    <div class="menuPrimario">
+
+
+        <div class="menuSecundario">
+
+            <h1>INCENTIVA CURSOS</h1>
+            <div class="input-container">
+                <label for="receitaInput">RECEITA:</label>
+                <input type="text" id="receitaInput" placeholder="Digite o valor da Receita" />
+            </div>
+            <div class="input-container">
+                <label for="diasInput">DIAS:</label>
+                <input type="text" id="diasInput" placeholder="Digite a Quantidade de Dias Trabalhados" />
+            </div>
+            <div class="input-container">
+                <label for="qteAtdInput">QTEATD:</label>
+                <input type="text" id="qteAtdInput" placeholder="Quantidade de Atendimentos" />
+            </div>
+            <div class="input-container">
+                <label for="totalQtyInput">QUANTIDADE TOTAL:</label>
+                <input type="text" id="totalQtyInput" placeholder="Digite a Quantidade Total" />
+            </div>
+        </div>
+
+
+        <div class="table-container">
+            <h1 style="text-align: center;">ESCOLA</h1>
+            <table id="dateTable">
+                <thead>
+                    <tr>
+                        <th>DATA</th>
+                        <th>QTE ATD</th>
+                        <th>N.R DIA</th>
+                        <th>QTE MTR</th>
+                        <th>CONS ATD</th>
+                        <th>CONS N.R</th>
+                        <th>CONS MTR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-container">
+            <h1 style="text-align: center;"><input class="inpuName" placeholder="DIGITE O NOME AQUI" type="text"></h1>
+            <table id="secondTable">
+                <thead>
+                    <tr>
+                        <th>QTE ATD</th>
+                        <th>N.R DIA</th>
+                        <th>QTE MTR</th>
+                        <th>CONS ATD</th>
+                        <th>CONS N.R</th>
+                        <th>CONS MTR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <script>
+
+        // Obtenha as referências dos campos de input
+        const receitaInput = document.getElementById('receitaInput');
+        const diasInput = document.getElementById('diasInput');
+        const qteAtdInput = document.getElementById('qteAtdInput');
+        const totalQtyInput = document.getElementById('totalQtyInput');
+
+        // Adicione os eventos de escuta de input para cada campo
+        receitaInput.addEventListener('input', calculateResult);
+        diasInput.addEventListener('input', calculateResult);
+        qteAtdInput.addEventListener('input', calculateResult);
+        totalQtyInput.addEventListener('input', calculateResult);
+
+        function calculateResult() {
+            const receitaInput = document.getElementById('receitaInput');
+            const diasInput = document.getElementById('diasInput');
+            const qteAtdInput = document.getElementById('qteAtdInput');
+            const totalQtyInput = document.getElementById('totalQtyInput');
+
+            const receita = parseFloat(receitaInput.value.replace(".", "").replace(",", "."));
+            const dias = parseInt(diasInput.value);
+            const totalQty = parseInt(totalQtyInput.value);
+
+            const dateTableBody = document.getElementById('dateTable').getElementsByTagName('tbody')[0];
+            const secondTableBody = document.getElementById('secondTable').getElementsByTagName('tbody')[0];
+
+            // Limpar as tabelas antes de adicionar as novas linhas
+            dateTableBody.innerHTML = '';
+            secondTableBody.innerHTML = '';
+
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+            const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            let totalQteAtd = 0; // Variável para armazenar o total acumulado de QTE ATD
+            let consNRAccumulated = 0; // Variável para armazenar o valor acumulado de CONS N.R
+
+            let remainingQty = totalQty; // Quantidade total restante a ser distribuída
+            let qteMtrAccumulated = 0; // Quantidade total acumulada na coluna QTE MTR
+            let consMtrAccumulated = 0; // Valor acumulado da coluna CONS MTR
+
+            for (let day = 1; day <= lastDay; day++) {
+                const formattedDate = `${day < 10 ? '0' + day : day}/${currentMonth + 1 < 10 ? '0' + (currentMonth + 1) : currentMonth + 1}/${currentYear}`;
+
+                let qteAtd = ''; // Define a variável inicialmente como vazia
+                if (new Date(currentYear, currentMonth, day).getDay() !== 0) {
+                    qteAtd = parseInt(qteAtdInput.value); // Atribui o valor da input apenas nos dias de semana
+                }
+
+                let row = '';
+                if (new Date(currentYear, currentMonth, day).getDay() === 0) {
+                    row = `
+                    <tr>
+                        <td>${formattedDate}</td>
+                        <td class="domingo" colspan="6">DOMINGO</td>
+                    </tr>
+                `;
+                } else {
+                    const consAtd = qteAtd + totalQteAtd; // Calcula o valor de CONS ATD somando QTE ATD com o total acumulado
+                    const formattedConsAtd = consAtd.toLocaleString('pt-BR');
+                    const formattedReceitaDiaria = (receita / dias).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    });
+
+                    consNRAccumulated += receita / dias; // Atualiza o valor acumulado de CONS N.R
+
+                    const formattedConsNR = consNRAccumulated.toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    });
+
+                    // Distribuir a quantidade total restante entre as células da quarta coluna
+                    let qteMtr = 0;
+                    if (day < lastDay) {
+                        const remainingDays = lastDay - day;
+                        qteMtr = Math.ceil((remainingQty - qteMtrAccumulated) / remainingDays);
+                        qteMtrAccumulated += qteMtr;
+                    } else {
+                        qteMtr = remainingQty - qteMtrAccumulated;
+                    }
+                    const formattedQteMtr = qteMtr.toLocaleString('pt-BR');
+
+                    row = `
+                    <tr>
+                        <td>${formattedDate}</td>
+                        <td>${qteAtd}</td>
+                        <td>${formattedReceitaDiaria}</td>
+                        <td>${formattedQteMtr}</td>
+                        <td>${consAtd}</td>
+                        <td>${formattedConsNR}</td>
+                        <td>${qteMtr + consMtrAccumulated}</td>
+                    </tr>
+                `;
+
+                    totalQteAtd += qteAtd; // Atualiza o total acumulado de QTE ATD
+                    consMtrAccumulated += qteMtr; // Atualiza o valor acumulado da coluna CONS MTR
+                }
+
+                dateTableBody.innerHTML += row;
+            }
+
+            // Adicionar células vazias na segunda tabela
+            let secondTableRow = '';
+            for (let i = 0; i < lastDay; i++) {
+                secondTableRow += `
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            `;
+            }
+
+            secondTableBody.innerHTML = secondTableRow;
+        }
+
+        // Chame a função para calcular os resultados inicialmente
+        calculateResult();
+    </script>
+</body>
+
+</html>
